@@ -26,8 +26,8 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v5
-      with:
-          fetch-depth: 0
+      # with:
+      #     fetch-depth: 0
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v5
@@ -42,7 +42,7 @@ jobs:
         echo "Tag: ${{ github.event.release.ref }}"
 
     - name: Get Version
-      uses: nivaes/version-pack@v3
+      uses: nivaes/version-pack@develop
       id: version_pack
       with:
         package-flow: ${{ github.event.action == 'prereleased' && 'Preview' || 'Release' }}
@@ -67,11 +67,12 @@ jobs:
         rm -f ./Artifacts/*.SourceGenerator.*.snupkg
 
     - name: Update release
-      uses: nivaes/update-release@v2  
+      uses: nivaes/update-release@v3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref_name }}
+        clean_assets: true
         files: |
           ./Artifacts/*.{nupkg,snupkg}
 
