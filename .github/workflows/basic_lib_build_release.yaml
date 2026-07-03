@@ -61,7 +61,7 @@ jobs:
 
     - name: Create Release
       id: create_release
-      uses: softprops/action-gh-release@develop
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.version_pack.outputs.version-release }}
         name: "Release ${{ steps.version_pack.outputs.version-number }}"
