@@ -73,4 +73,7 @@ jobs:
           ./Artifacts/*.{nupkg,snupkg}
 
     - name: Publish packages
-      run: dotnet nuget push ./Artifacts/*.{nupkg,snupkg} --skip-duplicate --source nuget.org --api-key ${{ secrets.nuget_token }}
+      shell: bash
+      run: |
+        shopt -s nullglob
+        dotnet nuget push ./Artifacts/*.{nupkg,snupkg} --skip-duplicate --source nuget.org --api-key ${{ secrets.nuget_token }}

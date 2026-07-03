@@ -3,6 +3,8 @@ ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
 words:
+  - nullglob
+  - shopt
   - snupkg
   - softprops
 ignoreWords: []
