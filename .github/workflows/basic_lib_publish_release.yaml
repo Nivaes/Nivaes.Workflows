@@ -9,6 +9,7 @@ on:
     secrets:
       nuget_token:
         required: true
+        
 permissions:
   contents: write
 
