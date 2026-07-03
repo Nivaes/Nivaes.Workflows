@@ -31,6 +31,10 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
+    - name: Release
+      run: |
+        git ls-remote --tags origin '2.3.*'
+    
     - name: Get Version
       uses: nivaes/version-pack@develop
       id: version_pack
