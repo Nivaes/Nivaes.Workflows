@@ -2,6 +2,10 @@ name: Publish Release
 
 on:
   workflow_call:
+    secrets:
+      nuget_token:
+        required: true
+
 
 permissions:
   contents: write
@@ -69,4 +73,4 @@ jobs:
           ./Artifacts/*.{nupkg,snupkg}
 
     - name: Publish packages
-      run: dotnet nuget push ./Artifacts/*.{nupkg,snupkg} --skip-duplicate --source nuget.org --api-key ${{ secrets.NIVAES_NUGET_TOKEN }}
+      run: dotnet nuget push ./Artifacts/*.{nupkg,snupkg} --skip-duplicate --source nuget.org --api-key ${{ secrets.nuget_token }}
