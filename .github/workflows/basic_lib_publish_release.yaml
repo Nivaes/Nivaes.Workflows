@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       nuget_source:
+        type: string
         required: true
     secrets:
       nuget_token:
