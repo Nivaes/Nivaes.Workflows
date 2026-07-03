@@ -30,7 +30,7 @@ jobs:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
   
     - name: Get Version
-      uses: nivaes/version-pack@develop
+      uses: nivaes/version-pack@v3
       id: version_pack
       with:
         prerelease: ${{ inputs.prerelease }}
@@ -54,7 +54,7 @@ jobs:
       uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.version_pack.outputs.version-release }}
-        name: "Release ${{ steps.version_pack.outputs.version-number }}"
+        name: "${{ inputs.prerelease || 'Release' }} ${{ steps.version_pack.outputs.version-number }}"
         body: |
           Automatic release generated from GitHub Actions.
         draft: true
