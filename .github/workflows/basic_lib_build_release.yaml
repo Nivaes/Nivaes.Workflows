@@ -2,6 +2,10 @@ name: Build Release
 
 on:
   workflow_call:
+    inputs:
+      prerelease:
+        type: string
+        required: true
 
 jobs:
   build_release:
@@ -30,6 +34,8 @@ jobs:
     - name: Get Version
       uses: nivaes/version-pack@develop
       id: version_pack
+      with:
+        prerelease: ${{ inputs.prerelease }}
 
     - name: Restore Dependencies
       run: |
