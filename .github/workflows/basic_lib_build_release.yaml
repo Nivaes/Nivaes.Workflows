@@ -20,8 +20,6 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v5
-      # with:
-      #   fetch-depth: 0
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v5
@@ -30,11 +28,7 @@ jobs:
         source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-    - name: tags
-      run: |
-        git ls-remote --tags origin '2.3.*'
-    
+  
     - name: Get Version
       uses: nivaes/version-pack@develop
       id: version_pack
@@ -54,10 +48,6 @@ jobs:
     - name: Pack
       if: github.event_name == 'push' || (github.event_name != 'pull_request')
       run: dotnet pack --configuration Release --no-build --verbosity normal --output ./Artifacts/ -p:Version=${{ steps.version_pack.outputs.version-pack }} --no-restore
-
-    # - name: Remove SourceGenerator symbols
-    #   run: |
-    #     rm -f ./Artifacts/*.SourceGenerator.*.snupkg
 
     - name: Create Release
       id: create_release
