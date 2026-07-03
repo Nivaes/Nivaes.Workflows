@@ -2,10 +2,12 @@ name: Publish Release
 
 on:
   workflow_call:
+    inputs:
+      nuget_source:
+        required: true
     secrets:
       nuget_token:
         required: true
-
 permissions:
   contents: write
 
@@ -79,4 +81,4 @@ jobs:
       shell: bash
       run: |
         shopt -s nullglob
-        dotnet nuget push ./Artifacts/*.{nupkg,snupkg} --skip-duplicate --source nuget.org --api-key ${{ secrets.nuget_token }}
+        dotnet nuget push ./Artifacts/*.nupkg --source ${{ inputs.nuget_source }} --skip-duplicate --api-key ${{secrets.nuget_token}}
