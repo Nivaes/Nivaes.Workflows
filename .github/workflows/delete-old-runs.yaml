@@ -20,7 +20,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           keep_minimum_runs: 15
-          check_pullrequest_exist: true
+          # check_pullrequest_exist: true
 
       - name: Delete runs from the deleted branch
         uses: Mattraks/delete-workflow-runs@v2
