@@ -25,6 +25,11 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
+    - name: Trust ASP.NET Core HTTPS certificate
+      run: |
+        dotnet dev-certs https --clean
+        dotnet dev-certs https --trust
+
     - name: Restore Dependencies
       run: |
           dotnet restore
