@@ -1,8 +1,9 @@
 version: "0.2"
 ignorePaths: []
 dictionaryDefinitions: []
-dictionaries: []
+dictionaries: [en, es]
 words:
+  - aspnet
   - nullglob
   - shopt
   - snupkg
