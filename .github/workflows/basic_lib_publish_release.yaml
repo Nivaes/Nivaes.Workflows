@@ -3,6 +3,10 @@ name: Publish Release
 on:
   workflow_call:
     inputs:
+      runs-on:
+        type: string
+        required: false
+        default: ubuntu-latest
       nuget_source:
         type: string
         required: true
@@ -16,7 +20,7 @@ permissions:
 
 jobs:
   publish_release:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
     - name: Dump GitHub context
