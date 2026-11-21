@@ -6,13 +6,14 @@ on:
       nuget_source:
         type: string
         required: true
-    secrets:
-      nuget_token:
-        required: true
+      nuget_user:
+        type: string
+        required: true 
         
 permissions:
   contents: write
   packages: write
+  id-token: write
 
 jobs:
   publish_release:
@@ -70,6 +71,12 @@ jobs:
       run: |
         rm -f ./Artifacts/*.SourceGenerator.*.snupkg
 
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ vars.NUGET_USER }}
+
     - name: Update release
       uses: nivaes/update-release@v3
       env:
@@ -79,12 +86,6 @@ jobs:
         clean_assets: true
         files: |
           ./Artifacts/*.{nupkg,snupkg}
-
-    - name: NuGet login (OIDC → temp API key)
-      uses: NuGet/login@v1
-      id: login
-      with:
-        user: ${{ vars.NUGET_USER }}
         
     - name: Publish packages
       shell: bash
