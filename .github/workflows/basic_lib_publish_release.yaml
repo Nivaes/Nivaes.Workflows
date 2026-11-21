@@ -33,12 +33,6 @@ jobs:
       if: github.event.action == 'prereleased'
       run: echo Prereleased
 
-    - name: NuGet login (OIDC → temp API key)
-      uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
-      id: login
-      with:
-        user: ${{ inputs.nuget_user }}
-
     - name: Checkout
       uses: actions/checkout@v7
 
@@ -77,8 +71,6 @@ jobs:
       run: |
         rm -f ./Artifacts/*.SourceGenerator.*.snupkg
 
-   
-
     - name: Update release
       uses: nivaes/update-release@v3
       env:
@@ -88,9 +80,23 @@ jobs:
         clean_assets: true
         files: |
           ./Artifacts/*.{nupkg,snupkg}
-        
-    - name: Publish packages
-      shell: bash
-      run: |
-        shopt -s nullglob
-        dotnet nuget push ./Artifacts/*.nupkg --source ${{ inputs.nuget_source }} --skip-duplicate --api-key ${{steps.login.outputs.NUGET_API_KEY}}
+
+    - name: Upload NuGet packages for publishing
+      uses: actions/upload-artifact@v7
+      with:
+        name: nuget-packages
+        path: ./Artifacts/*.nupkg
+        if-no-files-found: error
+        retention-days: 1
+
+    # - name: NuGet login (OIDC → temp API key)
+    #   uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+    #   id: login
+    #   with:
+    #     user: ${{ inputs.nuget_user }}
+          
+    # - name: Publish packages
+    #   shell: bash
+    #   run: |
+    #     shopt -s nullglob
+    #     dotnet nuget push ./Artifacts/*.nupkg --source ${{ inputs.nuget_source }} --skip-duplicate --api-key ${{steps.login.outputs.NUGET_API_KEY}}
