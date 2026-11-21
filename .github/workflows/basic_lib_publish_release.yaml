@@ -80,8 +80,14 @@ jobs:
         files: |
           ./Artifacts/*.{nupkg,snupkg}
 
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ vars.NUGET_USER }}
+        
     - name: Publish packages
       shell: bash
       run: |
         shopt -s nullglob
-        dotnet nuget push ./Artifacts/*.nupkg --source ${{ inputs.nuget_source }} --skip-duplicate --api-key ${{secrets.nuget_token}}
+        dotnet nuget push ./Artifacts/*.nupkg --source ${{ inputs.nuget_source }} --skip-duplicate --api-key ${{steps.login.outputs.NUGET_API_KEY}}
