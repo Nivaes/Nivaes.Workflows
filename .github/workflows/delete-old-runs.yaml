@@ -14,12 +14,12 @@ jobs:
       actions: write
       contents: read
     steps:
-      - name: Delete old workflow runs (mantener solo 15)
+      - name: Delete old workflow runs (mantener solo 30)
         uses: Mattraks/delete-workflow-runs@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
-          keep_minimum_runs: 15
+          keep_minimum_runs: 30
           # check_pullrequest_exist: true
 
       - name: Delete runs from the deleted branch
