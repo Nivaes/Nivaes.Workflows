@@ -1,4 +1,4 @@
-name: Publish Release
+name: Build Release
 
 on:
   workflow_call:
@@ -7,19 +7,12 @@ on:
         type: string
         required: false
         default: ubuntu-latest
-      nuget_source:
+      prerelease:
         type: string
         required: true
-    secrets:
-      nuget_token:
-        required: true
-        
-permissions:
-  contents: write
-  packages: write
 
 jobs:
-  publish_release:
+  build_release:
     runs-on: ${{ inputs.runs-on }}
 
     steps:
@@ -27,14 +20,6 @@ jobs:
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
-
-    - name: release
-      if: github.event.action == 'released'
-      run: echo Release
-
-    - name: prereleased
-      if: github.event.action == 'prereleased'
-      run: echo Prereleased
 
     - name: Checkout
       uses: actions/checkout@v7
@@ -46,17 +31,20 @@ jobs:
         source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-    - name: Release
-      run: |
-        echo "Tag: ${{ github.event.release.ref }}"
-
+  
     - name: Get Version
       uses: nivaes/version-pack@v3
       id: version_pack
       with:
-        version: ${{ github.ref_name }}
-        
+        prerelease: ${{ inputs.prerelease }}
+
+    - name: Trust ASP.NET Core HTTPS certificate
+      run: |
+        export SSL_CERT_DIR="$HOME/.aspnet/dev-certs/trust:/usr/lib/ssl/certs"
+        dotnet dev-certs https --clean
+        dotnet dev-certs https --trust
+        echo "SSL_CERT_DIR=$HOME/.aspnet/dev-certs/trust:/usr/lib/ssl/certs" >> "$GITHUB_ENV"
+
     - name: Restore Dependencies
       run: |
           dotnet restore
@@ -65,27 +53,25 @@ jobs:
       run: dotnet build --configuration Release -p:Version=${{ steps.version_pack.outputs.version-pack }} --no-restore
 
     - name: Test
-      run: dotnet test --configuration Release --no-build --verbosity normal --no-restore --no-build
+      run: dotnet test --configuration Release --no-build --no-restore --verbosity normal
 
     - name: Pack
+      if: github.event_name == 'push' || (github.event_name != 'pull_request')
       run: dotnet pack --configuration Release --no-build --verbosity normal --output ./Artifacts/ -p:Version=${{ steps.version_pack.outputs.version-pack }} --no-restore
 
     - name: Remove SourceGenerator symbols
       run: |
         rm -f ./Artifacts/*.SourceGenerator.*.snupkg
 
-    - name: Update release
-      uses: nivaes/update-release@v3
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v3
       with:
-        tag_name: ${{ github.ref_name }}
-        clean_assets: true
+        tag_name: ${{ steps.version_pack.outputs.version-release }}
+        name: "${{ inputs.prerelease || 'Release' }} ${{ steps.version_pack.outputs.version-pack }}"
+        body: |
+          Automatic release generated from GitHub Actions.
+        draft: true
+        prerelease: false
         files: |
           ./Artifacts/*.{nupkg,snupkg}
-
-    - name: Publish packages
-      shell: bash
-      run: |
-        shopt -s nullglob
-        dotnet nuget push ./Artifacts/*.nupkg --source ${{ inputs.nuget_source }} --skip-duplicate --api-key ${{secrets.nuget_token}}
