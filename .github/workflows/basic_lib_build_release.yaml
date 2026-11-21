@@ -67,7 +67,7 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v3
       with:
-        tag_name: ${{ steps.version_pack.outputs.version-release }}
+        tag_name: ${{ steps.version_pack.outputs.version-pack }}
         name: "${{ inputs.prerelease || 'Release' }} ${{ steps.version_pack.outputs.version-pack }}"
         body: |
           Automatic release generated from GitHub Actions.
